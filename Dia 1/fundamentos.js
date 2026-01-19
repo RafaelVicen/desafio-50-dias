@@ -1,61 +1,80 @@
 // ===========================================================
 // Semana 1 – Fundamentos
 // Desafio 50 Dias de Código
-// Este programa lê números digitados pelo utilizador, calcula
-// soma, média, maior e menor, e faz validação de entradas.
+// Mini app: analisa múltiplos tipos de números do dia a dia
 // ===========================================================
 
-// Mensagem inicial para o utilizador
-console.log("Bem-vindo ao desafio – Semana 1");
-
-// Criar interface de leitura do terminal
-// readline permite perguntar algo ao utilizador e capturar a resposta
 const readline = require('readline').createInterface({
-  input: process.stdin,   // entrada padrão (teclado)
-  output: process.stdout  // saída padrão (terminal)
+  input: process.stdin,
+  output: process.stdout
 });
 
-// Perguntar ao utilizador para digitar números separados por espaço
-// A resposta digitada será capturada na variável "entrada"
-readline.question('Digite números separados por espaço: ', entrada => {
+// Função para perguntar tipo de dado
+function escolherTipo(callback) {
+  console.log("\nEscolha o que você vai analisar hoje:");
+  console.log("1 - Gastos");
+  console.log("2 - Passos");
+  console.log("3 - Notas");
 
-  // Transformar a entrada em uma lista de números
-  // 1. split(' ') → divide a string em cada espaço
-  // 2. map(Number) → transforma cada pedaço em número
-  // 3. filter(n => !isNaN(n)) → remove valores inválidos (ex: letras)
-  const numeros = entrada.split(' ').map(Number).filter(n => !isNaN(n));
+  readline.question("Digite 1, 2 ou 3: ", tipo => {
+    let nomeTipo;
+    if (tipo === '1') nomeTipo = 'gasto';
+    else if (tipo === '2') nomeTipo = 'passo';
+    else if (tipo === '3') nomeTipo = 'nota';
+    else {
+      console.log("Opção inválida! Usando 'valor' como padrão.");
+      nomeTipo = 'valor';
+    }
+    callback(nomeTipo);
+  });
+}
 
-  // Verificar se a lista de números é válida
-  if (numeros.length === 0) {
-    // Se nenhum número válido foi digitado, avisamos o utilizador
-    console.log("Nenhum número válido foi digitado!");
-  } else {
-    // ==========================
-    // Cálculos principais
-    // ==========================
+// Função para processar a lista de números
+function processarNumeros(nomeTipo, callback) {
+  readline.question(`\nDigite os ${nomeTipo}s separados por espaço: `, entrada => {
+    const numeros = entrada.split(' ').map(Number).filter(n => !isNaN(n));
 
-    // Soma: acumulamos todos os números da lista
-    // reduce percorre a lista, acumulando valores
-    const soma = numeros.reduce((a, b) => a + b, 0);
+    if (numeros.length === 0) {
+      console.log(`❌ Nenhum ${nomeTipo} válido foi digitado. Tente novamente!`);
+    } else {
+      const soma = numeros.reduce((a, b) => a + b, 0);
+      const media = soma / numeros.length;
+      const maior = Math.max(...numeros);
+      const menor = Math.min(...numeros);
 
-    // Média: soma dividido pelo número de elementos
-    const media = soma / numeros.length;
+      console.log(`\n📊 Resultados dos seus ${nomeTipo}s:`);
+      console.log(`- 🔹 Total de ${nomeTipo}s: ${soma}`);
+      console.log(`- 🔹 Média de ${nomeTipo}s: ${media}`);
+      console.log(`- 🔹 Maior ${nomeTipo}: ${maior}`);
+      console.log(`- 🔹 Menor ${nomeTipo}: ${menor}`);
+      console.log("✅ Indicadores calculados com sucesso!\n");
+    }
+    callback(); // chama a próxima etapa
+  });
+}
 
-    // Maior número: usamos Math.max com spread operator (...)
-    const maior = Math.max(...numeros);
+// Função para perguntar se deseja continuar
+function perguntarContinuar() {
+  readline.question("Deseja analisar outro tipo de dado? (s/n): ", resposta => {
+    if (resposta.toLowerCase() === 's') {
+      iniciar(); // reinicia o fluxo
+    } else {
+      console.log("\nObrigado por usar o programa! Até a próxima 👋");
+      readline.close();
+    }
+  });
+}
 
-    // Menor número: usamos Math.min com spread operator (...)
-    const menor = Math.min(...numeros);
+// Função principal
+function iniciar() {
+  escolherTipo(nomeTipo => {
+    processarNumeros(nomeTipo, perguntarContinuar);
+  });
+}
 
-    // ==========================
-    // Mostrar resultados
-    // ==========================
-    console.log(`Soma: ${soma}`);      // mostra a soma
-    console.log(`Média: ${media}`);    // mostra a média
-    console.log(`Maior: ${maior}`);    // mostra o maior
-    console.log(`Menor: ${menor}`);    // mostra o menor
-  }
+// Mensagem inicial
+console.log("Bem-vindo ao desafio – Semana 1");
+console.log("💡 Este programa ajuda você a analisar rapidamente números do seu dia a dia: gastos, passos ou notas.");
+console.log("Ele calcula automaticamente soma, média, maior e menor valor de cada tipo de dado.\n");
 
-  // Fechar a interface de leitura para terminar o programa
-  readline.close();
-});
+iniciar();
